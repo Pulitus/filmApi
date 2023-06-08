@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=lol123
+      - MYSQL_DATABASE=moviedb
+    ports:
+      - 3307:3306
+    volumes:
+    - ./moviedb.sql:/docker-entrypoint-initdb.d/moviedb.sql
+    - ./db-dump:/var/lib/mysql
+    
+  app:
+    depends_on:
+      - mysqldb
+    build: ./film-api
+    restart: on-failure
+    ports:
+      - 8080:8080
+    environment:
+      - spring.datasource.url=jdbc:mysql://mysqldb:3306/moviedb?useSSL=false
+      - spring.datasource.username=root
+      - spring.datasource.password=lol123
+    stdin_open: true
+    tty: true
+
